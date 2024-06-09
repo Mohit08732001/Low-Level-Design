@@ -50,6 +50,7 @@ class ZipFileManager:
 # This principle states that a class should be open for extension but closed for modification
 
 from math import pi
+from typing import Any
 class Shape:
     def __init__(self, shape_type, **kwargs) -> None:
         self.shape_type = shape_type
@@ -95,3 +96,56 @@ class Circle(Shape):
 
 # Here we solved the issue of OCP, by creating an abstract class shape, which will never be modified, now if new shape comes we can create a new
 # class for that shape-type which will implement Shape abstarct class
+
+
+# L -> Liskov Substition Principle
+# It states that subtypes must be substitutable with their base types
+# This principle is about making your subclasses behave like their base classes
+# without breaking anyone’s expectations when they call the same methods
+
+class Rectangle:
+    def __init__(self, height, width) -> None:
+        self.height = height
+        self.width = width
+    
+    def calculate_area(self):
+        return self.height * self.width
+
+class Square(Rectangle):
+    def __init__(self, side) -> None:
+        super().__init__(side, side)
+    
+    def __setattr__(self, name: str, value: Any) -> None:
+        super().__setattr__(name, value)
+        if name in ["width", "height"]:
+            self.__dict__["height"] = value
+            self.__dict__["width"] = value
+
+# Here we are violating LSP, because for square shape it works fine, but now if we were to replace rectangle with sqaure it will not work as
+# we are setting height and width value same
+
+class Shape(ABC):
+    @abstractmethod
+    def calculate_area(self):
+        pass
+
+class Rectangle(Shape):
+    def __init__(self, height, width) -> None:
+        self.height = height
+        self.width = width
+    
+    def calculate_area(self):
+        return self.height * self.width
+
+class Square(Shape):
+    def __init__(self, side) -> None:
+        self.side = side
+    
+    def calculate_area(self):
+        return self.side ** 2
+
+def get_total_sum_of_area(shapes):
+    return sum(shape.calculate_area() for shape in shapes)
+
+# Here we solve the problem of LSP, by making sibling relation instead of parent child relation, and only common function is calculate_area between them
+# which can be used irrespective of shape
