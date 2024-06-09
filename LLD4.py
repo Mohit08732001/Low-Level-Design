@@ -149,3 +149,74 @@ def get_total_sum_of_area(shapes):
 
 # Here we solve the problem of LSP, by making sibling relation instead of parent child relation, and only common function is calculate_area between them
 # which can be used irrespective of shape
+
+
+# I -> Interface Segregation Principle(ISP)
+# Clients should not be forced to depend on those methods which they don't want to use. Interfaces belongs to clients, not hierarchies
+
+class Printer(ABC):
+    @abstractmethod
+    def print(self, document):
+        pass
+
+    @abstractmethod
+    def fax(self, document):
+        pass
+
+    @abstractmethod
+    def scan(self, document):
+        pass
+
+class OldPrinter(Printer):
+    def print(self, document):
+        print(f'Prints {document} in black and white')
+    
+    def fax(self, document):
+        raise NotImplementedError()
+    
+    def scan(self, document):
+        raise NotImplementedError()
+
+class ModernPrinter(Printer):
+    def print(self, document):
+        print(f'Prints {document} in color')
+    
+    def fax(self, document):
+        print(f'Faxing {document}')
+    
+    def scan(self, document):
+        print(f'Scanning {document}')
+    
+# Here, we are violating ISP, by making OldPrinter to implement fax and scan methods, even if does not support those
+
+class Printer(ABC):
+    @abstractmethod
+    def print(self, document):
+        pass
+
+class Fax(ABC):
+    @abstractmethod
+    def fax(self, document):
+        pass
+
+class Scan(ABC):
+    @abstractmethod
+    def scan(self, document):
+        pass
+
+class OldPrinter(Printer):
+    def print(self, document):
+        print(f'Prints {document} in black and white')
+
+class ModernPrinter(Printer, Fax, Scan):
+    def print(self, document):
+        print(f'Prints {document} in color')
+    
+    def fax(self, document):
+        print(f'Faxing {document}')
+    
+    def scan(self, document):
+        print(f'Scanning {document}')
+
+# Here we have fixed the issue by segrating the single interface into three interfaces with different responsibilities. OldPrinter now only
+# implement Printer interface and does not have unused methods
