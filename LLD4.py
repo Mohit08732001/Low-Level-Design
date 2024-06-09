@@ -220,3 +220,46 @@ class ModernPrinter(Printer, Fax, Scan):
 
 # Here we have fixed the issue by segrating the single interface into three interfaces with different responsibilities. OldPrinter now only
 # implement Printer interface and does not have unused methods
+
+
+# D -> Dependency Inversion Principle (DIP)
+# Abstractions should not depend on details, details should depend on abstractions.
+# In simple terms, no two class should depend on each other, they should depend on interface
+
+class FrontEnd:
+    def __init__(self, back_end) -> None:
+        self.back_end = back_end
+    
+    def display_data(self):
+        data = self.back_end.get_data_from_database()
+        print('Display data: ', data)
+
+class Backend:
+    def get_data_from_database():
+        return "Data From Database"
+
+# Here we are violating DIP, because two classes are tightly coupled, say we want to get data from rest api now,
+# we need to modify both classes, which also violates OCP
+
+class FrontEnd:
+    def __init__(self, data_source) -> None:
+        self.data_source = data_source
+    
+    def display_data(self):
+        data = self.data_source.get_data()
+        print('Display data: ', data)
+
+class DataSource(ABC):
+    @abstractmethod
+    def get_data(self):
+        pass
+
+class DataBase(DataSource):
+    def get_data(self):
+        return "Data from Database"
+
+class API(DataSource):
+    def get_data(self):
+        return "Data from API"
+
+# Here we solved the issue of DIP, by using an interface between front end and backend, which returns data based on the data source.
